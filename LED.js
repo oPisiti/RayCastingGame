@@ -1,33 +1,50 @@
 class LED{
 
   constructor(){
-    // (x3,y3)=(this.pos.x,this.pos.y)
-    // (x4,y4)=(this.ray[i].x+this.pos.x,this.ray[i].y+this.pos.y)
-    this.pos=createVector(10,10);
+
+    this.pos=createVector(100,100);
 
     this.ray=[];
     this.angles=[];                   //Information on all the angles of the rays
     this.delta_ang=radians(fov/n_rays);
+    this.point=[];                    //Contains all the intersection points. 1 for each ray
+    this.distance=[];                 //Contains the distance from the light source and the respectivepoint
+    this.which=[];                    //this.which contains the Information on which wall it hit
 
+    let count_=0;
     for(let a=-radians(fov/2);a<=(radians(fov/2));a+=this.delta_ang){
       this.angles.push(a);
       this.ray.push(p5.Vector.fromAngle(a,1));
-    }
-
-    this.point=[];                   //Contains all the intersection points. 1 for each ray
-    for(let i=0;i<=n_rays;i++){
-      this.point[i]=createVector(Infinity,Infinity);
-    }
-
-    this.distance=[];               //Contains the distance from the light source and the respectivepoint
-    this.which=[];                  //this.which contains the Information on which wall it hit
-    for(let i=0;i<this.point.length;i++){
-      this.distance[i]=null;
-      this.which[i]=null;
+      this.point[count_]=createVector(Infinity,Infinity);
+      this.distance[count_]=null;
+      this.which[count_]=null;
+      count_++;
     }
 
     this.d_ang=0;                   //Keep track of the angles on arrow update rectMode
                                     // See update_light_dir_arrow for more
+
+
+    // PLAYER COLLISION WITH THE WALLS
+    this.n_player_collision=16;
+    this.ray_player_collision=[];
+    this.distance_player_collision=[];
+    this.point_player_collision=[];
+
+    count_=0;
+    for(let a=0;a<radians(360);a+=radians(360/this.n_player_collision)){
+      this.ray_player_collision.push(p5.Vector.fromAngle(a,1));
+      this.ray_player_collision[count_].z=a;                // z contains the angle in radians
+      this.point_player_collision[count_]=createVector(Infinity,Infinity);
+      this.distance_player_collision[count_]=null;
+      count_++;
+    }
+
+    //             ['w','s','a','d']
+    this.able_move=[true,true,true,true];
+
+    this.y=height/2;                      //Implemented for the jump mechanic
+    this.is_jumping=false;
 
   }
 
@@ -46,6 +63,7 @@ class LED{
       this.angles[i]=angles_temp[i];
     }
 
+
     for(let a=(-radians(fov/2)+this.d_ang);a<=(radians(fov/2)+this.d_ang+0.01);a+=this.delta_ang){
       ray_temp.push(p5.Vector.fromAngle(a,1));
     }
@@ -54,28 +72,59 @@ class LED{
       this.ray[i]=ray_temp[i];
     }
 
+    let ray_player_collision_temp=[];
+    let count=0;
+    for(let a=this.d_ang;a<(this.d_ang+radians(360)-0.01);a+=radians(360/this.n_player_collision)){
+      ray_player_collision_temp.push(p5.Vector.fromAngle(a,1));
+      ray_player_collision_temp[count].z=a;
+      this.ray_player_collision[count]=ray_player_collision_temp[count];
+      count++;
+    }    
+
   }
 
+  // This algorithm bases itself on minimum distances
+  // It needs to reset those in order to determine the minimum for that set of variables
   reset(){
-    for(let i=0;i<=n_rays;i++){
+
+    for(let i=0;i<=this.ray.length;i++){
       this.point[i]=createVector(Infinity,Infinity);
     }
+
+    for(let i=0;i<this.point_player_collision.length;i++){
+      this.point_player_collision[i]=createVector(Infinity,Infinity);
+      this.distance_player_collision[i]=null;
+    }
+
+    this.able_move=[true,true,true,true];
+
   }
 
 
   // Updates with mouse
   update_light_dir(){
+
     let d=mouseX-width/2;              //Distance from the center of the screen
     let sens=150;                         //Sensibility of the mouse
-    let d_ang=d/sens;
+    this.d_ang=d/sens;
+
 
     let ray_temp=[];
-    for(let a=(-radians(fov/2)+d_ang);a<=(radians(fov/2)+d_ang+0.01);a+=this.delta_ang){
+    for(let a=(-radians(fov/2)+this.d_ang);a<=(radians(fov/2)+this.d_ang+0.01);a+=this.delta_ang){
       ray_temp.push(p5.Vector.fromAngle(a,1));
     }
 
     for(let i=0;i<this.ray.length;i++){
       this.ray[i]=ray_temp[i];
+    }
+
+    let ray_player_collision_temp=[];
+    let count=0;
+    for(let a=this.d_ang;a<(this.d_ang+radians(360)-0.01);a+=radians(360/this.n_player_collision)){
+      ray_player_collision_temp.push(p5.Vector.fromAngle(a,1));
+      ray_player_collision_temp[count].z=a;
+      this.ray_player_collision[count]=ray_player_collision_temp[count];
+      count++;
     }
 
   }
@@ -93,12 +142,21 @@ class LED{
     this.d_ang+=d;
 
     let ray_temp=[];
-    for(let a=(-radians(fov/2)+this.d_ang);a<=(radians(fov/2)+this.d_ang+0.01);a+=this.delta_ang){
+    for(let a=(this.d_ang-radians(fov/2));a<=(this.d_ang+radians(fov/2)+0.01);a+=this.delta_ang){
       ray_temp.push(p5.Vector.fromAngle(a,1));
     }
 
     for(let i=0;i<this.ray.length;i++){
       this.ray[i]=ray_temp[i];
+    }
+
+    let ray_player_collision_temp=[];
+    let count=0;
+    for(let a=this.d_ang;a<(this.d_ang+radians(360)-0.01);a+=radians(360/this.n_player_collision)){
+      ray_player_collision_temp.push(p5.Vector.fromAngle(a,1));
+      ray_player_collision_temp[count].z=a;
+      this.ray_player_collision[count]=ray_player_collision_temp[count];
+      count++;
     }
 
   }
@@ -146,6 +204,54 @@ class LED{
       }
 
     }
+
+    // Player collision calculations
+    for(let i=0;i<this.ray_player_collision.length;i++){
+
+      let x4=this.ray_player_collision[i].x+this.pos.x;
+      let y4=this.ray_player_collision[i].y+this.pos.y;
+
+      den=(x1-x2)*(y3-y4)-(y1-y2)*(x3-x4);
+      num_t=(x1-x3)*(y3-y4)-(y1-y3)*(x3-x4);
+      num_u=(x1-x2)*(y1-y3)-(y1-y2)*(x1-x3);
+      t=num_t/den;
+      u=-num_u/den;
+
+      if(t>=0 && t<=1 && u>=0){
+        // The point collides
+        let p_temp=createVector(x1+t*(x2-x1),y1+t*(y2-y1));
+
+        if(p5.Vector.dist(this.pos, p_temp)<p5.Vector.dist(this.pos, this.point_player_collision[i])){
+          this.point_player_collision[i]=p_temp.copy();
+          this.distance_player_collision[i]=(p5.Vector.dist(this.pos, p_temp));
+        }
+
+        let angle_forward=this.ray_player_collision[i].z-this.d_ang;
+
+        // Determining which directions to block
+        if(this.distance_player_collision[i]<20){
+          if(angle_forward>(radians(-45)) && angle_forward<=radians(45)){
+            this.able_move[0]=false;  //'w'
+            console.log("Blocked W");
+          }
+          else if(angle_forward>(radians(180-45)) && angle_forward<=radians(180+45)){
+            this.able_move[1]=false;  //'s'
+            console.log("Blocked S");
+          }
+          else if(angle_forward>(radians(270-45)) && angle_forward<=radians(270+45)){
+            this.able_move[2]=false;  //'a'
+            console.log("Blocked A");
+          }
+          else if(angle_forward>(radians(90-45)) && angle_forward<=radians(90+45)){
+            this.able_move[3]=false;  //'d'
+            console.log("Blocked d");
+          }
+        }
+
+      }
+
+    }
+
 
   }
 
@@ -235,7 +341,7 @@ class LED{
     // let y_p=map(this.pos.y,0,height,0,minimap_height);
     point(x_p,y_p);
 
-    // Render the boundaries
+    // Renders the boundaries
     for(let i=0;i<bound.length;i++){
       let x1=map(bound[i].v1_pos.x,0,width,0,w);
       let y1=map(bound[i].v1_pos.y,0,height,0,h);
@@ -250,6 +356,19 @@ class LED{
       let y_ps=map(this.point[i].y,0,height,0,h);
       line(x_p,y_p,x_ps,y_ps);
     }
+
+    // Renders the player collision n_rays
+    // for(let i=0;i<this.point_player_collision.length;i++){
+    //   let x_ps=map(this.point_player_collision[i].x,0,width,0,w);
+    //   let y_ps=map(this.point_player_collision[i].y,0,height,0,h);
+    //
+    //   stroke(0,255,0);
+    //
+    //   if(this.distance_player_collision[i]<100){
+    //     stroke(0,0,100);
+    //   }
+    //   line(x_p,y_p,x_ps,y_ps);
+    // }
 
     pop();
 
