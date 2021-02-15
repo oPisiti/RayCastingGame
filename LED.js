@@ -31,6 +31,31 @@ class LED{
 
   }
 
+  update_fov(){
+
+    let angles_temp=[];
+    let ray_temp=[];
+
+    this.delta_ang=radians(fov/n_rays);
+
+    for(let a=-radians(fov/2);a<=(radians(fov/2));a+=this.delta_ang){
+      angles_temp.push(a);
+    }
+
+    for(let i=0;i<this.angles.length;i++){
+      this.angles[i]=angles_temp[i];
+    }
+
+    for(let a=(-radians(fov/2)+this.d_ang);a<=(radians(fov/2)+this.d_ang+0.01);a+=this.delta_ang){
+      ray_temp.push(p5.Vector.fromAngle(a,1));
+    }
+
+    for(let i=0;i<this.ray.length;i++){
+      this.ray[i]=ray_temp[i];
+    }
+
+  }
+
   reset(){
     for(let i=0;i<=n_rays;i++){
       this.point[i]=createVector(Infinity,Infinity);
@@ -130,8 +155,15 @@ class LED{
   // Will use this.distance: account for the distances from source to points
   render(bound){
     rectMode(CENTER);
-    let w=map(n_rays,0,1000,100,0);     //width wall
-    let h=1000;    //height wall
+    let w=map(n_rays,0,1500,100,0);     //width wall
+    let h=1000;                         //height wall
+
+    let n_skips=null;
+    let count=0;
+    let changes_wall=false;
+
+    let last_x;
+    let last_width;
 
     push();
     noStroke();
@@ -141,7 +173,37 @@ class LED{
       fill(f);
       let x=map(this.angles[i],-radians(fov/2),radians(fov/2),-50,width+50);                      //percentage of the width that represents x
       let w_dist=150/this.distance[i];                                        //The effect of the distance into the size
-      rect(x,height/2,w*w_dist,h*w_dist);
+
+      if(i>0 && this.which[i]!=this.which[i-1]){
+        // CHANGES WALLS
+        changes_wall=true;
+        if(i<(this.angles.length-1)){
+          n_skips=(last_width-w*w_dist/2)/(map(this.angles[i+1],-radians(fov/2),radians(fov/2),-50,width+50)-(x));
+        }
+      }
+      else if (changes_wall==false) {
+        last_x=x;
+        last_width=w*w_dist;
+      }
+
+      if(changes_wall==false){
+        fill(f);
+        rect(x,height/2,w*w_dist,h*w_dist);
+      }
+
+      if(changes_wall && count<n_skips){
+        count++;
+      }
+      else if(changes_wall==true){
+        push();
+        fill(20);
+        rect(x,height/2,w*w_dist,h*w_dist);
+        changes_wall=false;
+        count=0;
+        pop();
+      }
+
+
     }
 
     pop();

@@ -4,12 +4,15 @@
 let wall=[];
 let light;
 
-let n_rays=500;
+let n_rays=1200;
 let fov=45;                           // FOV in degrees
 
 let camera_mode="arrow";                      // "mouse" for mouse movement
                                               // "arrow" for arrow movements
 let max_distance_ever;                        // Used on the greyscaling in LED.render();
+
+let slider;
+let last_fov=fov;
 
 function setup(){
 
@@ -32,22 +35,32 @@ function setup(){
 
   max_distance_ever=max(sqrt(width**2+height**2));
 
+  slider = createSlider(1, 360, 45);
+  slider.position(20, height-20);
+  slider.style('width', '100px');
+
 }
 
 function draw(){
+
+  last_fov=slider.value();
+  if(last_fov!=fov){
+    fov=last_fov;
+    light.update_fov();
+  }
 
   background(20);
 
   if (keyIsDown(87)) {
     key_pressed("w");
   }
-  else if (keyIsDown(83)) {
+  if (keyIsDown(83)) {
     key_pressed("s");
   }
-  else if (keyIsDown(65)) {
+  if (keyIsDown(65)) {
     key_pressed("a");
   }
-  else if (keyIsDown(68)) {
+  if (keyIsDown(68)) {
     key_pressed("d");
   }
 
@@ -69,13 +82,10 @@ function draw(){
     light.collision(wall[i],i);
   }
 
-  light.render(wall);
+  light.render();
   light.render_minimap(wall);
 
   light.reset();
-
-  // noLoop();
-
 
 }
 
