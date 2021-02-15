@@ -44,120 +44,9 @@ class LED{
     this.able_move=[true,true,true,true];
 
     this.y=height/2;                      //Implemented for the jump mechanic
+    this.vy=0;
+    this.g=1;
     this.is_jumping=false;
-
-  }
-
-  update_fov(){
-
-    let angles_temp=[];
-    let ray_temp=[];
-
-    this.delta_ang=radians(fov/n_rays);
-
-    for(let a=-radians(fov/2);a<=(radians(fov/2));a+=this.delta_ang){
-      angles_temp.push(a);
-    }
-
-    for(let i=0;i<this.angles.length;i++){
-      this.angles[i]=angles_temp[i];
-    }
-
-
-    for(let a=(-radians(fov/2)+this.d_ang);a<=(radians(fov/2)+this.d_ang+0.01);a+=this.delta_ang){
-      ray_temp.push(p5.Vector.fromAngle(a,1));
-    }
-
-    for(let i=0;i<this.ray.length;i++){
-      this.ray[i]=ray_temp[i];
-    }
-
-    let ray_player_collision_temp=[];
-    let count=0;
-    for(let a=this.d_ang;a<(this.d_ang+radians(360)-0.01);a+=radians(360/this.n_player_collision)){
-      ray_player_collision_temp.push(p5.Vector.fromAngle(a,1));
-      ray_player_collision_temp[count].z=a;
-      this.ray_player_collision[count]=ray_player_collision_temp[count];
-      count++;
-    }    
-
-  }
-
-  // This algorithm bases itself on minimum distances
-  // It needs to reset those in order to determine the minimum for that set of variables
-  reset(){
-
-    for(let i=0;i<=this.ray.length;i++){
-      this.point[i]=createVector(Infinity,Infinity);
-    }
-
-    for(let i=0;i<this.point_player_collision.length;i++){
-      this.point_player_collision[i]=createVector(Infinity,Infinity);
-      this.distance_player_collision[i]=null;
-    }
-
-    this.able_move=[true,true,true,true];
-
-  }
-
-
-  // Updates with mouse
-  update_light_dir(){
-
-    let d=mouseX-width/2;              //Distance from the center of the screen
-    let sens=150;                         //Sensibility of the mouse
-    this.d_ang=d/sens;
-
-
-    let ray_temp=[];
-    for(let a=(-radians(fov/2)+this.d_ang);a<=(radians(fov/2)+this.d_ang+0.01);a+=this.delta_ang){
-      ray_temp.push(p5.Vector.fromAngle(a,1));
-    }
-
-    for(let i=0;i<this.ray.length;i++){
-      this.ray[i]=ray_temp[i];
-    }
-
-    let ray_player_collision_temp=[];
-    let count=0;
-    for(let a=this.d_ang;a<(this.d_ang+radians(360)-0.01);a+=radians(360/this.n_player_collision)){
-      ray_player_collision_temp.push(p5.Vector.fromAngle(a,1));
-      ray_player_collision_temp[count].z=a;
-      this.ray_player_collision[count]=ray_player_collision_temp[count];
-      count++;
-    }
-
-  }
-
-
-  // Updates with arrows
-  update_light_dir_arrow(key){
-
-    let d=radians(2);
-
-    if(key=="l"){
-      d*=(-1);
-    }
-
-    this.d_ang+=d;
-
-    let ray_temp=[];
-    for(let a=(this.d_ang-radians(fov/2));a<=(this.d_ang+radians(fov/2)+0.01);a+=this.delta_ang){
-      ray_temp.push(p5.Vector.fromAngle(a,1));
-    }
-
-    for(let i=0;i<this.ray.length;i++){
-      this.ray[i]=ray_temp[i];
-    }
-
-    let ray_player_collision_temp=[];
-    let count=0;
-    for(let a=this.d_ang;a<(this.d_ang+radians(360)-0.01);a+=radians(360/this.n_player_collision)){
-      ray_player_collision_temp.push(p5.Vector.fromAngle(a,1));
-      ray_player_collision_temp[count].z=a;
-      this.ray_player_collision[count]=ray_player_collision_temp[count];
-      count++;
-    }
 
   }
 
@@ -232,19 +121,15 @@ class LED{
         if(this.distance_player_collision[i]<20){
           if(angle_forward>(radians(-45)) && angle_forward<=radians(45)){
             this.able_move[0]=false;  //'w'
-            console.log("Blocked W");
           }
           else if(angle_forward>(radians(180-45)) && angle_forward<=radians(180+45)){
             this.able_move[1]=false;  //'s'
-            console.log("Blocked S");
           }
           else if(angle_forward>(radians(270-45)) && angle_forward<=radians(270+45)){
             this.able_move[2]=false;  //'a'
-            console.log("Blocked A");
           }
           else if(angle_forward>(radians(90-45)) && angle_forward<=radians(90+45)){
             this.able_move[3]=false;  //'d'
-            console.log("Blocked d");
           }
         }
 
@@ -303,7 +188,7 @@ class LED{
         }
 
         if(changes_wall==false){
-          rect(x,height/2,w*w_dist,h*w_dist);
+          rect(x,this.y,w*w_dist,h*w_dist);
         }
 
         if(changes_wall && count<n_skips){
@@ -312,7 +197,7 @@ class LED{
         else if(changes_wall==true){
           push();
           fill(background_color);
-          rect(x,height/2,w*w_dist,h*w_dist);
+          rect(x,this.y,w*w_dist,h*w_dist);
           changes_wall=false;
           count=0;
           pop();

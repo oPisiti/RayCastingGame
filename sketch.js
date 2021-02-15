@@ -46,17 +46,34 @@ function setup(){
        [2100,500,2100,1000],
        [2100,1000,1000,1000],
        [1000,1000,1000,500],
-       [1000,500,500,500],
-       [500,500,500,1000],
-       [500,1000,0,1000],
+       [1000,500,700,500],
+       [700,500,700,1000],
+       [700,1000,0,1000],
        [0,1000,0,0],
-       [1400,600,1600,600],
-       [1600,600,1600,800],
-       [1600,800,1400,800],
-       [1400,800,1400,600],
+       // Square
+       [1200,600,1400,600],
+       [1400,600,1400,800],
+       [1400,800,1200,800],
+       [1200,800,1200,600],
+       // Cross
+       [1700,600,1900,800],
+       [1900,600,1700,800],
+       // Triangle
        [2700,100,2700,400],
        [2700,400,2200,250],
-       [2200,250,2700,100]];
+       [2200,250,2700,100],
+       // Oculus
+       [175,400,550,400],
+       [550,400,575,425],
+       [575,425,575,575],
+       [575,575,550,600],
+       [550,600,450,600],
+       [450,600,363,500],
+       [363,500,275,600],
+       [275,600,175,600],
+       [175,600,150,575],
+       [150,575,150,425],
+       [150,425,175,400]];
 
   for(let i=0;i<map_walls.length;i++){
     wall[i]=new Wall(map_walls[i][0],map_walls[i][1],map_walls[i][2],map_walls[i][3]);
@@ -75,22 +92,21 @@ function draw(){
   last_fov=slider.value();
   if(last_fov!=fov){
     fov=last_fov;
-    light.update_fov();
+    update_fov(light,fov);
   }
 
   background(background_color);
 
-
   if(camera_mode=="arrow"){
     if(keyIsDown(LEFT_ARROW)){
-      light.update_light_dir_arrow("l");
+      update_light_dir_arrow(light,"l");
     }
     else if (keyIsDown(RIGHT_ARROW)) {
-      light.update_light_dir_arrow("r");
+      update_light_dir_arrow(light,"r");
     }
   }
   else if (camera_mode=="mouse") {
-    light_update=light.update_light_dir();
+    update_light_dir(light);
   }
 
 
@@ -111,10 +127,14 @@ function draw(){
     key_pressed("d");
   }
 
+  if(light.is_jumping==true){
+    update_jump(light);
+  }
+
   light.render();
   light.render_minimap(wall);
 
-  light.reset();
+  reset(light);
 
 }
 
@@ -156,4 +176,16 @@ function key_pressed(key) {
       break;
   }
 
+}
+
+function keyPressed() {
+  if (keyCode ==32) {
+
+    if(light.is_jumping==false){
+      light.vy=10;
+    }
+
+    light.is_jumping=true;
+
+  }
 }
