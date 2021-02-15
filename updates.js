@@ -64,7 +64,7 @@ function reset(l){
 // Updates with mouse
 function update_light_dir(l){
 
-  let d=mouseX-width/2;              //Distance from the center of the screen
+  let d=mouseX-width/2;                 //Distance from the center of the screen
   let sens=150;                         //Sensibility of the mouse
   l.d_ang=d/sens;
 
@@ -120,3 +120,14 @@ function update_light_dir_arrow(l,key){
   }
 
 }
+
+// Receives the LED object VECTOR of the Bullet
+// function destroy_bullet(bull){
+//
+//   if(bull[0].able_move[0]==false){
+//     let a=[];
+//     return a;
+//     // console.log("bull: ",bull);
+//   }
+//
+// }
