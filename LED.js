@@ -3,7 +3,7 @@ class LED{
   constructor(){
     // (x3,y3)=(this.pos.x,this.pos.y)
     // (x4,y4)=(this.ray[i].x+this.pos.x,this.ray[i].y+this.pos.y)
-    this.pos=createVector(width/2,height/2);
+    this.pos=createVector(10,10);
 
     this.ray=[];
     this.angles=[];                   //Information on all the angles of the rays
@@ -154,6 +154,7 @@ class LED{
   // Will use this.angless: account for the angles
   // Will use this.distance: account for the distances from source to points
   render(bound){
+
     rectMode(CENTER);
     let w=map(n_rays,0,1500,100,0);     //width wall
     let h=1000;                         //height wall
@@ -165,44 +166,52 @@ class LED{
     let last_x;
     let last_width;
 
+    let please_render=true;
+
     push();
     noStroke();
 
     for(let i=0;i<this.angles.length;i++){
-      let f=map(this.distance[i],0,max_distance_ever,255,30);
-      fill(f);
-      let x=map(this.angles[i],-radians(fov/2),radians(fov/2),-50,width+50);                      //percentage of the width that represents x
-      let w_dist=150/this.distance[i];                                        //The effect of the distance into the size
+      let f=map(this.distance[i],0,render_distance,255,30);
 
-      if(i>0 && this.which[i]!=this.which[i-1]){
-        // CHANGES WALLS
-        changes_wall=true;
-        if(i<(this.angles.length-1)){
-          n_skips=(last_width-w*w_dist/2)/(map(this.angles[i+1],-radians(fov/2),radians(fov/2),-50,width+50)-(x));
+      please_render=true
+      if(f<background_color){
+        please_render=false;
+      }
+
+      if(please_render){
+        fill(f);
+        let x=map(this.angles[i],-radians(fov/2),radians(fov/2),-50,width+50);                      //percentage of the width that represents x
+        let w_dist=150/this.distance[i];                                        //The effect of the distance into the size
+
+        if(i>0 && this.which[i]!=this.which[i-1]){
+          // CHANGES WALLS
+          changes_wall=true;
+          if(i<(this.angles.length-1)){
+            n_skips=(last_width-w*w_dist/2)/(map(this.angles[i+1],-radians(fov/2),radians(fov/2),-50,width+50)-(x));
+          }
+        }
+        else if (changes_wall==false) {
+          last_x=x;
+          last_width=w*w_dist;
+        }
+
+        if(changes_wall==false){
+          rect(x,height/2,w*w_dist,h*w_dist);
+        }
+
+        if(changes_wall && count<n_skips){
+          count++;
+        }
+        else if(changes_wall==true){
+          push();
+          fill(background_color);
+          rect(x,height/2,w*w_dist,h*w_dist);
+          changes_wall=false;
+          count=0;
+          pop();
         }
       }
-      else if (changes_wall==false) {
-        last_x=x;
-        last_width=w*w_dist;
-      }
-
-      if(changes_wall==false){
-        fill(f);
-        rect(x,height/2,w*w_dist,h*w_dist);
-      }
-
-      if(changes_wall && count<n_skips){
-        count++;
-      }
-      else if(changes_wall==true){
-        push();
-        fill(20);
-        rect(x,height/2,w*w_dist,h*w_dist);
-        changes_wall=false;
-        count=0;
-        pop();
-      }
-
 
     }
 
@@ -211,11 +220,22 @@ class LED{
   }
 
   render_minimap(bound){
+
     let w=width/5;
     let h=height/5;
 
     push();
+
     stroke(200,0,0);
+
+    // Renders player as a point
+    let x_p=map(this.pos.x,0,width,0,w);
+    let y_p=map(this.pos.y,0,height,0,h);
+    // let x_p=map(this.pos.x,0,width,0,minimap_width);
+    // let y_p=map(this.pos.y,0,height,0,minimap_height);
+    point(x_p,y_p);
+
+    // Render the boundaries
     for(let i=0;i<bound.length;i++){
       let x1=map(bound[i].v1_pos.x,0,width,0,w);
       let y1=map(bound[i].v1_pos.y,0,height,0,h);
@@ -224,16 +244,11 @@ class LED{
       line(x1,y1,x2,y2);
     }
 
-    let x_p=map(this.pos.x,0,width,0,w);
-    let y_p=map(this.pos.y,0,height,0,h);
-    point(x_p,y_p);
-
+    // Renders the rays
     for(let i=0;i<this.point.length;i++){
-
       let x_ps=map(this.point[i].x,0,width,0,w);
       let y_ps=map(this.point[i].y,0,height,0,h);
       line(x_p,y_p,x_ps,y_ps);
-
     }
 
     pop();

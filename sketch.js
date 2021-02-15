@@ -1,39 +1,65 @@
 // 04/01/2020 Lauro França
 // Ray casting from the mouse position to all the wall lines
 
+let map_walls=[];
 let wall=[];
 let light;
 
+let background_color=0;
 let n_rays=1200;
 let fov=45;                           // FOV in degrees
 
 let camera_mode="arrow";                      // "mouse" for mouse movement
                                               // "arrow" for arrow movements
-let max_distance_ever;                        // Used on the greyscaling in LED.render();
+
+let render_distance;                        // Used on the greyscaling in LED.render();
 
 let slider;
 let last_fov=fov;
 
+let minimap_width=300;
+let minimap_height=300;
+
 function setup(){
 
   createCanvas(windowWidth,windowHeight-10);
-  background(20);
+  background(background_color);
 
-  // 0-3 reserved for outer walls
-  wall[0]=new Wall(0,0,0,height);
-  wall[1]=new Wall(width,0,width,height);
-  wall[2]=new Wall(0,0,width,0);
-  wall[3]=new Wall(0,height,width,height);
+  // ----------       -----------
+  // |         |_____|          |
+  // |     ____     _      -----
+  // |    |    |   | |    |
+  // -----     -----------
 
-  wall[4]=new Wall(width/4,height/4,width/4,3*height/4);
-  wall[5]=new Wall(width/4,height/4,width/2,height/4);
-  wall[6]=new Wall(width/4,3*height/4,width/2,3*height/4);
-  wall[7]=new Wall(random(width),random(height),random(width),random(height));
-  wall[8]=new Wall(random(width),random(height),random(width),random(height));
+  // The map[] must contain the points of the vertices of every wall
+  // in the for of [x1,y1,x2,y2]
+  map_walls=[[0,0,1000,0],
+       [1000,0,1000,250],
+       [1000,250,2000,250],
+       [2000,250,2000,0],
+       [2000,0,3000,0],
+       [3000,0,3000,500],
+       [3000,500,2100,500],
+       [2100,500,2100,1000],
+       [2100,1000,1000,1000],
+       [1000,1000,1000,500],
+       [1000,500,500,500],
+       [500,500,500,1000],
+       [500,1000,0,1000],
+       [0,1000,0,0],
+       [1400,600,1600,600],
+       [1600,600,1600,800],
+       [1600,800,1400,800],
+       [1400,800,1400,600]];
+
+  for(let i=0;i<map_walls.length;i++){
+    wall[i]=new Wall(map_walls[i][0],map_walls[i][1],map_walls[i][2],map_walls[i][3]);
+  }
 
   light=new LED();
 
-  max_distance_ever=max(sqrt(width**2+height**2));
+  // render_distancer=max(sqrt(width**2+height**2));
+  render_distance=1000;
 
   slider = createSlider(1, 360, 45);
   slider.position(20, height-20);
@@ -49,7 +75,7 @@ function draw(){
     light.update_fov();
   }
 
-  background(20);
+  background(background_color);
 
   if (keyIsDown(87)) {
     key_pressed("w");
