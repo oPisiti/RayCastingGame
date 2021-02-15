@@ -20,9 +20,15 @@ class LED{
     }
 
     this.distance=[];               //Contains the distance from the light source and the respectivepoint
+    this.which=[];                  //this.which contains the Information on which wall it hit
     for(let i=0;i<this.point.length;i++){
       this.distance[i]=null;
+      this.which[i]=null;
     }
+
+    this.d_ang=0;                   //Keep track of the angles on arrow update rectMode
+                                    // See update_light_dir_arrow for more
+
   }
 
   reset(){
@@ -31,6 +37,8 @@ class LED{
     }
   }
 
+
+  // Updates with mouse
   update_light_dir(){
     let d=mouseX-width/2;              //Distance from the center of the screen
     let sens=150;                         //Sensibility of the mouse
@@ -47,8 +55,32 @@ class LED{
 
   }
 
+
+  // Updates with arrows
+  update_light_dir_arrow(key){
+
+    let d=radians(2);
+
+    if(key=="l"){
+      d*=(-1);
+    }
+
+    this.d_ang+=d;
+
+    let ray_temp=[];
+    for(let a=(-radians(fov/2)+this.d_ang);a<=(radians(fov/2)+this.d_ang+0.01);a+=this.delta_ang){
+      ray_temp.push(p5.Vector.fromAngle(a,1));
+    }
+
+    for(let i=0;i<this.ray.length;i++){
+      this.ray[i]=ray_temp[i];
+    }
+
+  }
+
+
   // Will receive a vector containing all of the boundaries
-  collision(bound){
+  collision(bound,index){
 
     let den;
     let num_t;
@@ -82,7 +114,8 @@ class LED{
 
         if(p5.Vector.dist(this.pos, p_temp)<p5.Vector.dist(this.pos, this.point[i])){
           this.point[i]=p_temp.copy();
-          this.distance[i]=p5.Vector.dist(this.pos, p_temp);
+          this.distance[i]=(p5.Vector.dist(this.pos, p_temp));
+          this.which[i]=index;
         }
 
       }
@@ -91,35 +124,26 @@ class LED{
 
   }
 
-  render_ray(){
-    push();
-    stroke(255,100);
-    strokeWeight(1);
-    for(let i=0;i<this.ray.length;i++){
-      line(this.pos.x,this.pos.y,this.point[i].x,this.point[i].y);
-    }
-    pop();
-  }
-
   // Main function on this project
   // the fov parameter will account for the whole screen
   // Will use this.angless: account for the angles
   // Will use this.distance: account for the distances from source to points
-  render(){
+  render(bound){
     rectMode(CENTER);
-    let w=200;     //width wall
+    let w=map(n_rays,0,1000,100,0);     //width wall
     let h=1000;    //height wall
 
     push();
     noStroke();
-    let ma=max(this.distance);
+
     for(let i=0;i<this.angles.length;i++){
-      let f=map(this.distance[i],0,ma,255,100);
+      let f=map(this.distance[i],0,max_distance_ever,255,30);
       fill(f);
       let x=map(this.angles[i],-radians(fov/2),radians(fov/2),-50,width+50);                      //percentage of the width that represents x
-      let w_dist=150/this.distance[i];                                                 //The effect of the distance into the size
+      let w_dist=150/this.distance[i];                                        //The effect of the distance into the size
       rect(x,height/2,w*w_dist,h*w_dist);
     }
+
     pop();
 
   }

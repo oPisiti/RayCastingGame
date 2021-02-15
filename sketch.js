@@ -4,12 +4,16 @@
 let wall=[];
 let light;
 
-let n_rays=1000;
-let fov=45;                           //FOV in degrees
+let n_rays=500;
+let fov=45;                           // FOV in degrees
+
+let camera_mode="arrow";                      // "mouse" for mouse movement
+                                              // "arrow" for arrow movements
+let max_distance_ever;                        // Used on the greyscaling in LED.render();
 
 function setup(){
 
-  createCanvas(windowWidth,windowHeight);
+  createCanvas(windowWidth,windowHeight-10);
   background(20);
 
   // 0-3 reserved for outer walls
@@ -18,12 +22,15 @@ function setup(){
   wall[2]=new Wall(0,0,width,0);
   wall[3]=new Wall(0,height,width,height);
 
-  wall[4]=new Wall(width/2+250,height/2-50,width/2+150,height/2+50);
-  wall[5]=new Wall(width/2-250,height/2,width/2+150,200);
-  wall[6]=new Wall(random(width),random(height),random(width),random(height));
+  wall[4]=new Wall(width/4,height/4,width/4,3*height/4);
+  wall[5]=new Wall(width/4,height/4,width/2,height/4);
+  wall[6]=new Wall(width/4,3*height/4,width/2,3*height/4);
   wall[7]=new Wall(random(width),random(height),random(width),random(height));
+  wall[8]=new Wall(random(width),random(height),random(width),random(height));
 
   light=new LED();
+
+  max_distance_ever=max(sqrt(width**2+height**2));
 
 }
 
@@ -44,13 +51,25 @@ function draw(){
     key_pressed("d");
   }
 
-  light.update_light_dir();
 
-  for(let i=0;i<wall.length;i++){
-    light.collision(wall[i]);
+  if(camera_mode=="arrow"){
+    if(keyIsDown(LEFT_ARROW)){
+      light.update_light_dir_arrow("l");
+    }
+    else if (keyIsDown(RIGHT_ARROW)) {
+      light.update_light_dir_arrow("r");
+    }
+  }
+  else if (camera_mode=="mouse") {
+    light_update=light.update_light_dir();
   }
 
-  light.render();
+
+  for(let i=0;i<wall.length;i++){
+    light.collision(wall[i],i);
+  }
+
+  light.render(wall);
   light.render_minimap(wall);
 
   light.reset();
