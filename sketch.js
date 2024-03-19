@@ -8,7 +8,7 @@ let light;
 
 let background_color=0;
 let n_rays=1200;
-let fov=45;                                   // FOV in degrees
+let fov=75;                                   // FOV in degrees
 
 let camera_mode="arrow";                      // "mouse" for mouse movement
                                               // "arrow" for arrow movements
@@ -27,7 +27,7 @@ let map_length;
 
 function setup(){
 
-  createCanvas(windowWidth,windowHeight-10);
+  createCanvas(windowWidth,windowHeight);
   background(background_color);
 
   // ----------       -----------
@@ -37,45 +37,52 @@ function setup(){
   // -----     -----------
 
   // The map[] must contain the points of the vertices of every wall
-  // in the for of [x1,y1,x2,y2]
-  map_walls=[[0,0,1000,0],
-       [1000,0,1000,250],
-       [1000,250,2000,250],
-       [2000,250,2000,0],
-       [2000,0,3000,0],
-       [3000,0,3000,500],
-       [3000,500,2100,500],
-       [2100,500,2100,1000],
-       [2100,1000,1000,1000],
-       [1000,1000,1000,500],
-       [1000,500,700,500],
-       [700,500,700,1000],
-       [700,1000,0,1000],
-       [0,1000,0,0],
-       // Square
-       [1200,600,1400,600],
-       [1400,600,1400,800],
-       [1400,800,1200,800],
-       [1200,800,1200,600],
-       // Cross
-       [1700,600,1900,800],
-       [1900,600,1700,800],
-       // Triangle
-       [2700,100,2700,400],
-       [2700,400,2200,250],
-       [2200,250,2700,100],
-       // Oculus
-       [175,400,550,400],
-       [550,400,575,425],
-       [575,425,575,575],
-       [575,575,550,600],
-       [550,600,450,600],
-       [450,600,363,500],
-       [363,500,275,600],
-       [275,600,175,600],
-       [175,600,150,575],
-       [150,575,150,425],
-       [150,425,175,400]];
+  // in the form of [x1,y1,x2,y2]
+  map_walls=[
+    // Outer walls
+    [0,    0,    1000, 0   ],
+    [1000, 0,    1000, 250 ],
+    [1000, 250,  2000, 250 ],
+    [2000, 250,  2000, 0   ],
+    [2000, 0,    3000, 0   ],
+    [3000, 0,    3000, 500 ],
+    [3000, 500,  2400, 500 ],
+    [2400, 500,  2100, 750 ],
+    [2100, 750,  2100, 1000],
+    [2100, 1000, 1000, 1000],
+    [1000, 1000, 1000, 800 ],
+    [1000, 800,  700,  800 ],
+    [700,  800,  700,  1000],
+    [700,  1000, 0,    1000],
+    [0,    1000, 0,    0   ],
+
+    // Square
+    [1500, 600 , 1400, 800 ],
+    [1400, 800 , 1200, 800 ],
+    [1200, 800 , 1100, 600 ],
+
+    // Cross
+    [1700, 600 , 1900, 800 ],
+    [1900, 600 , 1700, 800 ],
+
+    // Triangle
+    [2700, 100 , 2700, 400 ],
+    [2700, 400 , 2300, 250 ],
+    [2300, 250 , 2700, 100 ],
+
+    // Oculus
+    [175,  400,  550,  400 ],
+    [550,  400,  575,  425 ],
+    [575,  425,  575,  575 ],
+    [575,  575,  550,  600 ],
+    [550,  600,  450,  600 ],
+    [450,  600,  363,  500 ],
+    [363,  500,  275,  600 ],
+    [275,  600,  175,  600 ],
+    [175,  600,  150,  575 ],
+    [150,  575,  150,  425 ],
+    [150,  425,  175,  400 ]];
+
 
   map_length=map_walls.length;
 
@@ -85,7 +92,7 @@ function setup(){
 
   light=new LED();
 
-  slider = createSlider(1, 360, 45);
+  slider = createSlider(1, 360, 75);
   slider.position(20, height-20);
   slider.style('width', '100px');
 
@@ -163,7 +170,7 @@ function draw(){
 }
 
 function key_pressed(key) {
-  let step=5;
+  let movementSpeed=7.5;
   let index=floor(light.ray.length/2)+1;            //Index of the central position of light.ray
 
   let angle_between=light.ray[index].heading();
@@ -172,30 +179,30 @@ function key_pressed(key) {
   switch (key) {
     case 'w':
       if(light.able_move[0]){
-        light.pos.x+=step*light.ray[index].x;
-        light.pos.y+=step*light.ray[index].y;
+        light.pos.x+=movementSpeed*light.ray[index].x;
+        light.pos.y+=movementSpeed*light.ray[index].y;
       }
       break;
     case 's':
       if(light.able_move[1]){
-        light.pos.x+=-step*light.ray[index].x;
-        light.pos.y+=-step*light.ray[index].y;
+        light.pos.x+=-movementSpeed*light.ray[index].x;
+        light.pos.y+=-movementSpeed*light.ray[index].y;
       }
       break;
     case 'a':
       if(light.able_move[2]){
         angle=angle_between+radians(90);
         vec=p5.Vector.fromAngle(angle,1);
-        light.pos.x+=-step*vec.x;
-        light.pos.y+=-step*vec.y;
+        light.pos.x+=-movementSpeed*vec.x;
+        light.pos.y+=-movementSpeed*vec.y;
       }
       break;
     case 'd':
       if(light.able_move[3]){
         angle=angle_between-radians(90);
         vec=p5.Vector.fromAngle(angle,1);
-        light.pos.x+=-step*vec.x;
-        light.pos.y+=-step*vec.y;
+        light.pos.x+=-movementSpeed*vec.x;
+        light.pos.y+=-movementSpeed*vec.y;
       }
       break;
   }
