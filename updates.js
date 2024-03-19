@@ -120,3 +120,14 @@ function update_light_dir_arrow(l,key){
   }
 
 }
+
+// Receives the LED object VECTOR of the Bullet
+// function destroy_bullet(bull){
+//
+//   if(bull[0].able_move[0]==false){
+//     let a=[];
+//     return a;
+//     // console.log("bull: ",bull);
+//   }
+//
+// }
