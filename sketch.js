@@ -2,6 +2,8 @@
 // Ray casting from the mouse position to all the wall lines
 
 
+// Need to implement the jumping mechanics
+
 let map_walls=[];
 let wall=[];
 let light;
@@ -20,10 +22,6 @@ let last_fov=fov;
 
 let minimap_width=300;
 let minimap_height=300;
-
-let bullet=[];
-let bullet_LED=[];
-let map_length;
 
 function setup(){
 
@@ -84,8 +82,6 @@ function setup(){
     [150,  425,  175,  400 ]];
 
 
-  map_length=map_walls.length;
-
   for(let i=0;i<map_walls.length;i++){
     wall[i]=new Wall(map_walls[i][0],map_walls[i][1],map_walls[i][2],map_walls[i][3]);
   }
@@ -120,10 +116,6 @@ function draw(){
     update_light_dir(light);
   }
 
-  // Updating the bullet position
-  if(bullet.length>0){
-    bullet[0].update();
-  }
 
   for(let i=0;i<wall.length;i++){
     light.collision(wall[i],i);
@@ -146,24 +138,8 @@ function draw(){
     update_jump(light);
   }
 
-  // First Rendering: Background walls
-  if(bullet_LED.length>0){
-    light.render("Wall",bullet_LED[0]);
-  }
-  else{
-    light.render("Wall");
-  }
+  light.render();
   light.render_minimap(wall);
-
-  // Collision with the bullet to determine its rendering
-  if(bullet.length>0){
-    bullet_LED[0].update_bullet_pos(bullet[0]);
-    light.collision(bullet[0],wall.length);
-    light.render("bullet");
-    // bullet_LED[0].collision(bullet[0],0);
-    // destroy_bullet(bullet_LED);
-    // console.log("Bullet_LED: ",bullet_LED);
-  }
 
   reset(light);
 
@@ -219,39 +195,4 @@ function keyPressed() {
     light.is_jumping=true;
 
   }
-}
-
-function mouseClicked() {
-
-  // Bullet will be made of two objects: A boundary and an LED. Both movable
-  // The LED will be used for the light emission
-  // The boundary for the drawing or not of the Bullet
-
-  let size=20;               //Size of the particle
-  let far=100;               //How far from player it will be initialized
-
-  let x_aux=light.pos.x+far*cos(-light.d_ang);
-  let y_aux=light.pos.y-far*sin(-light.d_ang);
-
-  let x_1=x_aux+sin(-light.d_ang)*size/2;
-  let y_1=y_aux+cos(-light.d_ang)*size/2;
-  let x_2=x_aux-sin(-light.d_ang)*size/2;
-  let y_2=y_aux-cos(-light.d_ang)*size/2;
-
-  // if(wall.length==map_length){
-  //   wall.push(new Wall(x_1,y_1,x_2,y_2,light.d_ang));
-  // }
-  // else{
-  //   wall[map_walls.length]=new Wall(x_1,y_1,x_2,y_2,light.d_ang);
-  // }
-
-  if(bullet.length<=1){
-    bullet[0]=new Wall(x_1,y_1,x_2,y_2,light.d_ang);
-    bullet_LED[0]= new LED();
-  }
-  else{
-    bullet[bullet.length-1]=new Wall(x_1,y_1,x_2,y_2,light.d_ang);
-    bullet_LED[bullet.length-1]= new LED();
-  }
-
 }
