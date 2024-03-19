@@ -8,7 +8,7 @@ class LED{
     this.angles=[];                   //Information on all the angles of the rays
     this.delta_ang=radians(fov/n_rays);
     this.point=[];                    //Contains all the intersection points. 1 for each ray
-    this.distance=[];                 //Contains the distance from the light source and the respectivepoint
+    this.distance=[];                 //Contains the distance from the light source and the respective point
     this.which=[];                    //this.which contains the Information on which wall it hit
 
     let count_=0;
@@ -142,7 +142,7 @@ class LED{
 
   // Main function on this project
   // the fov parameter will account for the whole screen
-  // Will use this.angless: account for the angles
+  // Will use this.angles: account for the angles
   // Will use this.distance: account for the distances from source to points
   render(bound){
 
@@ -172,7 +172,7 @@ class LED{
 
       if(please_render){
         fill(f);
-        let x=map(this.angles[i],-radians(fov/2),radians(fov/2),-50,width+50);                      //percentage of the width that represents x
+        let x=map(this.angles[i],-radians(fov/2),radians(fov/2),-50,width+50);  //percentage of the width that represents x
         let w_dist=150/this.distance[i];                                        //The effect of the distance into the size
 
         if(i>0 && this.which[i]!=this.which[i-1]){
@@ -222,8 +222,7 @@ class LED{
     // Renders player as a point
     let x_p=map(this.pos.x,0,width,0,w);
     let y_p=map(this.pos.y,0,height,0,h);
-    // let x_p=map(this.pos.x,0,width,0,minimap_width);
-    // let y_p=map(this.pos.y,0,height,0,minimap_height);
+
     point(x_p,y_p);
 
     // Renders the boundaries
@@ -241,19 +240,6 @@ class LED{
       let y_ps=map(this.point[i].y,0,height,0,h);
       line(x_p,y_p,x_ps,y_ps);
     }
-
-    // Renders the player collision n_rays
-    // for(let i=0;i<this.point_player_collision.length;i++){
-    //   let x_ps=map(this.point_player_collision[i].x,0,width,0,w);
-    //   let y_ps=map(this.point_player_collision[i].y,0,height,0,h);
-    //
-    //   stroke(0,255,0);
-    //
-    //   if(this.distance_player_collision[i]<100){
-    //     stroke(0,0,100);
-    //   }
-    //   line(x_p,y_p,x_ps,y_ps);
-    // }
 
     pop();
 
