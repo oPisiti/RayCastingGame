@@ -25,7 +25,7 @@ let minimap_height=300;
 
 function setup(){
 
-  createCanvas(windowWidth,windowHeight-10);
+  createCanvas(windowWidth,windowHeight);
   background(background_color);
 
   // ----------       -----------
