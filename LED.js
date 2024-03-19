@@ -6,9 +6,7 @@ class LED{
 
     this.ray=[];
     this.angles=[];                   //Information on all the angles of the rays
-
     this.delta_ang=radians(fov/n_rays);
-
     this.point=[];                    //Contains all the intersection points. 1 for each ray
     this.distance=[];                 //Contains the distance from the light source and the respective point
     this.which=[];                    //this.which contains the Information on which wall it hit
@@ -24,7 +22,7 @@ class LED{
     }
 
     this.d_ang=0;                   //Keep track of the angles on arrow update rectMode
-                                    //See update_light_dir_arrow for more
+                                    // See update_light_dir_arrow for more
 
 
     // PLAYER COLLISION WITH THE WALLS
@@ -146,15 +144,11 @@ class LED{
   // the fov parameter will account for the whole screen
   // Will use this.angles: account for the angles
   // Will use this.distance: account for the distances from source to points
-  render(what,...bull){                  //Determines if it is a wall or a bullet
+  render(bound){
 
     rectMode(CENTER);
     let w=map(n_rays,0,1500,100,0);     //width wall
     let h=1000;                         //height wall
-
-    if(what=="bullet"){
-      h*=1/7;
-    }
 
     let n_skips=null;
     let count=0;
@@ -169,72 +163,45 @@ class LED{
     noStroke();
 
     for(let i=0;i<this.angles.length;i++){
-      let f=map(this.distance[i],0,render_distance,255,30);              //THIS IS THE DEFAULT DISTANCE TO THE FILL
+      let f=map(this.distance[i],0,render_distance,255,30);
 
-      please_render=true;
+      please_render=true
       if(f<background_color){
         please_render=false;
       }
 
       if(please_render){
-        let x=map(this.angles[i],-radians(fov/2),radians(fov/2),-50,width+50);                      //percentage of the width that represents x
+        fill(f);
+        let x=map(this.angles[i],-radians(fov/2),radians(fov/2),-50,width+50);  //percentage of the width that represents x
         let w_dist=150/this.distance[i];                                        //The effect of the distance into the size
 
-        // If the rays hit the bullet on the *second* casting, only render the Bullet
-        // "bullet" means the second casting. It's objective is to determine the bullet's distances
-        if(what=="bullet"){
-          if(this.which[i]==(map_length)){
-            fill(250);
-            rect(x,this.y,w*w_dist,h*w_dist);
+        if(i>0 && this.which[i]!=this.which[i-1]){
+          // CHANGES WALLS
+          changes_wall=true;
+          if(i<(this.angles.length-1)){
+            n_skips=(last_width-w*w_dist/2)/(map(this.angles[i+1],-radians(fov/2),radians(fov/2),-50,width+50)-(x));
           }
         }
-        else{
-          // This means the first casting. It's objective is to determine the wall's distances
-
-          // Determining the fill f depending on the distance from player to wall and bullet to Wall
-          // The [0] is due to the ...bullet, which returns an array
-          if(bull.length>0){
-            let d=bull[0].pos.dist(this.point[i]);
-            // f+=(d*1/10);
-            f-=map(d,0,1000,0,150);
-            fill(f);
-          }
-          else{                   //Determines the supposed light source in the beginning to avoid weird flicks when the first bullet comes along
-            f=0;
-          }
-
-          fill(f);
-
-          if(i>0 && this.which[i]!=this.which[i-1]){
-            // CHANGES WALLS
-            changes_wall=true;
-            if(i<(this.angles.length-1)){
-              n_skips=(last_width-w*w_dist/2)/(map(this.angles[i+1],-radians(fov/2),radians(fov/2),-50,width+50)-(x));
-            }
-          }
-          else if (changes_wall==false) {
-            last_x=x;
-            last_width=w*w_dist;
-          }
-
-          if(changes_wall==false){
-            rect(x,this.y,w*w_dist,h*w_dist);
-          }
-
-          if(changes_wall && count<n_skips){
-            count++;
-          }
-          else if(changes_wall==true){
-            push();
-            fill(background_color);
-            rect(x,this.y,w*w_dist,h*w_dist);
-            changes_wall=false;
-            count=0;
-            pop();
-          }
-
+        else if (changes_wall==false) {
+          last_x=x;
+          last_width=w*w_dist;
         }
 
+        if(changes_wall==false){
+          rect(x,this.y,w*w_dist,h*w_dist);
+        }
+
+        if(changes_wall && count<n_skips){
+          count++;
+        }
+        else if(changes_wall==true){
+          push();
+          fill(background_color);
+          rect(x,this.y,w*w_dist,h*w_dist);
+          changes_wall=false;
+          count=0;
+          pop();
+        }
       }
 
     }
@@ -275,22 +242,6 @@ class LED{
     }
 
     pop();
-
-  }
-
-
-  // Updating the LEd part of the bullet to the wall part of it
-  // Will receive the Wall object of the bullet
-  update_bullet_pos(bull_wall){
-
-    let x_temp=(bull_wall.v1_pos.x+bull_wall.v2_pos.x)/2;
-    let y_temp=(bull_wall.v1_pos.y+bull_wall.v2_pos.y)/2;
-
-    this.pos.x=x_temp;
-    this.pos.y=y_temp;
-
-    // console.clear();
-    // console.log("Bullet Position: ",this.pos);
 
   }
 
