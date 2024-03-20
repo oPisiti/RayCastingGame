@@ -1,9 +1,20 @@
-# RayTracing
+# Ray Casting Demo
 
 A game based on ray casting that got a bit out of hand
 
 ![raycast](https://github.com/oPisiti/RayCastingGame/assets/78967454/b18342f9-86f3-4b6d-8731-6b174e5c14b0)
 
+## How it works
+
+The base of the calculations is the minimap.
+
+On every frame, 1200 lines are created from the player, given a certain angle.
+
+If the line intercepts any wall, their distance is calculated. 
+
+Then, a vertical rectangle is drawn on screen. Its x position is determined by the angle. Its size and shade, by the distance. This creates the illusion of depth and a light fog.
+
+For movement, the position of the player is updated accordingly. For the FOV slider, the difference in the angle of the lines is increased or decreased.
 
 ## Usage
 
