@@ -1,3 +1,6 @@
+// Author:  Lauro França @oPisiti
+// Created: 2024
+
 class Wall{
 
   constructor(x1,y1,x2,y2){

@@ -1,3 +1,6 @@
+// Author:  Lauro França @oPisiti
+// Created: 2024
+
 function update_jump(l){
   l.vy-=l.g;
   l.y+=l.vy;

@@ -1,3 +1,6 @@
+// Author:  Lauro França @oPisiti
+// Created: 2024
+
 class LED{
 
   constructor(){

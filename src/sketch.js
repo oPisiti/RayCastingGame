@@ -1,4 +1,5 @@
-// 04/01/2020 Lauro França
+// Author:  Lauro França @oPisiti
+// Created: 2024
 // Ray casting from the mouse position to all the wall lines
 
 
