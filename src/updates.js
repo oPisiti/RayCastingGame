@@ -1,5 +1,12 @@
-// Author:  Lauro França @oPisiti
-// Created: 2024
+// ********************************************************************
+//  Author: Lauro França (oPisiti)                                    #
+//  Contact:                                                          #
+//    github: oPisiti                                                 #
+//    Email: contact@opisiti.com                                      #
+//  Date: January, 2024                                               #
+//  Description:                                                      #
+//    A helper file which defines the physics functionality           #                                                          #
+// ********************************************************************
 
 function update_jump(l){
   l.vy-=l.g;

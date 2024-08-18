@@ -1,6 +1,13 @@
-// Author:  Lauro França @oPisiti
-// Created: 2024
-// Ray casting from the mouse position to all the wall lines
+// ********************************************************************
+//  Author: Lauro França (oPisiti)                                    #
+//  Contact:                                                          #
+//    github: oPisiti                                                 #
+//    Email: contact@opisiti.com                                      #
+//  Date: January, 2024                                               #
+//  Description:                                                      #
+//    A game based on ray casting that got a bit out of hand.         #
+//    Ray casting from the mouse position to all the wall lines       #
+// ********************************************************************
 
 
 // Need to implement the jumping mechanics
